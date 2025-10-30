@@ -14,5 +14,5 @@ window.APP_CONFIG = {
     }
   },
   // Leave empty to use same-origin server (recommended)
-  BACKEND_URL: ""
+  BACKEND_URL: "https://valikon.cloud"
 };
