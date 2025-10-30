@@ -1,0 +1,32 @@
+[
+  {
+    "id": "evt-1761819895583",
+    "address": "0xb5ED2D88E961785eA695D53c61804Fe8A64cdA8C",
+    "refCode": "R8Q2ZP",
+    "referrer": "0x73062F02DD59c30c569F180950D65642EC9e613A",
+    "referrerCode": "K4T1XS",
+    "txHash": "0xa6fbe022d5077a6bf0e6ad5f4cd599a9a78aa3d7c15a83c79138480647156964",
+    "createdAt": 1761819895583,
+    "updatedAt": 1761819895583
+  },
+  {
+    "id": "evt-1761823464466",
+    "address": "0x73062F02DD59c30c569F180950D65642EC9e613A",
+    "refCode": "K4T1XS",
+    "referrer": null,
+    "referrerCode": null,
+    "txHash": "0xe6265200989ad8e0df94aab2728a6274f6fe342868ba1641e8938c187afc6f25",
+    "createdAt": 1761823464466,
+    "updatedAt": 1761823464466
+  },
+  {
+    "id": "c2ee8693-4c0a-4420-b2af-b9246cea940b",
+    "address": "0x73062F02DD59c30c569F180950D65642EC9e613A",
+    "refCode": "K4T1XS",
+    "referrer": null,
+    "referrerCode": null,
+    "txHash": "0xc0f883d78e19004bccdb52e273c32f1266d1b94c94589012f70b3a400b4ace5c",
+    "createdAt": 1761824673121,
+    "updatedAt": 1761824673121
+  }
+]

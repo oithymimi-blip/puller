@@ -1,0 +1,2 @@
+# Netlify: ensure clean admin route works without .html
+/admin    /admin.html    200
