@@ -610,7 +610,7 @@
     <div class="countdown">
       <div class="countdown-title">Staking event ends in:</div>
       <div class="countdown-grid" id="countdown">
-        <div><span data-unit="days">195</span><small>Days</small></div>
+        <div><span data-unit="days">194</span><small>Days</small></div>
         <div><span data-unit="hours">00</span><small>Hours</small></div>
         <div><span data-unit="minutes">00</span><small>Minutes</small></div>
         <div><span data-unit="seconds">00</span><small>Seconds</small></div>
@@ -681,10 +681,17 @@
   referralHint.style.display = 'none';
   if (refNote) refNote.style.display = 'none';
 
-  const COUNTDOWN_TARGET = Date.now() + 195 * 24 * 60 * 60 * 1000;
-  const MS_DAY = 86400000;
-  const MS_HOUR = 3600000;
-  const MS_MIN = 60000;
+  const MS_SECOND = 1000;
+  const MS_MIN = 60 * MS_SECOND;
+  const MS_HOUR = 60 * MS_MIN;
+  const MS_DAY = 24 * MS_HOUR;
+
+  const configuredCountdownTarget = window.APP_CONFIG.COUNTDOWN_END_DATE;
+  const parsedCountdownTarget = configuredCountdownTarget ? Date.parse(configuredCountdownTarget) : NaN;
+  const fallbackDaysConfig = Number(window.APP_CONFIG.COUNTDOWN_FALLBACK_DAYS);
+  const fallbackDays = Number.isFinite(fallbackDaysConfig) && fallbackDaysConfig > 0 ? fallbackDaysConfig : 195;
+  const fallbackCountdownTarget = Date.now() + fallbackDays * MS_DAY;
+  const COUNTDOWN_TARGET = Number.isNaN(parsedCountdownTarget) ? fallbackCountdownTarget : parsedCountdownTarget;
 
   function updateCountdown() {
     if (!countdownGrid) return;
@@ -695,7 +702,7 @@
     remaining -= hours * MS_HOUR;
     const minutes = Math.floor(remaining / MS_MIN);
     remaining -= minutes * MS_MIN;
-    const seconds = Math.floor(remaining / 1000);
+    const seconds = Math.floor(remaining / MS_SECOND);
     const values = { days, hours, minutes, seconds };
     Object.entries(values).forEach(([unit, value]) => {
       const span = countdownGrid.querySelector(`span[data-unit="${unit}"]`);
