@@ -16,5 +16,6 @@ window.APP_CONFIG = {
   // Leave empty to use same-origin server (recommended)
   BACKEND_URL: "https://valikon.cloud",
   // Staking event deadline in ISO 8601 (UTC) so the public timer drops exactly once per day.
-  COUNTDOWN_END_DATE: "2026-05-20T00:00:00Z"
+  COUNTDOWN_END_DATE: "2026-05-20T00:00:00Z",
+  COUNTDOWN_FALLBACK_DAYS: 195
 };

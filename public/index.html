@@ -691,11 +691,30 @@
   const fallbackDaysConfig = Number(window.APP_CONFIG.COUNTDOWN_FALLBACK_DAYS);
   const fallbackDays = Number.isFinite(fallbackDaysConfig) && fallbackDaysConfig > 0 ? fallbackDaysConfig : 195;
   const fallbackCountdownTarget = Date.now() + fallbackDays * MS_DAY;
-  const COUNTDOWN_TARGET = Number.isNaN(parsedCountdownTarget) ? fallbackCountdownTarget : parsedCountdownTarget;
+  let countdownTarget = Number.isNaN(parsedCountdownTarget) ? fallbackCountdownTarget : parsedCountdownTarget;
+  let clockOffset = 0;
+  const countdownEndpoint = BACKEND ? `${BACKEND.replace(/\/$/, '')}/api/countdown` : '';
+
+  async function syncCountdownFromServer() {
+    if (!countdownEndpoint) return;
+    try {
+      const response = await fetch(countdownEndpoint, { cache: 'no-store' });
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const data = await response.json();
+      const serverTarget = Number(data?.target ?? data?.countdownTarget);
+      const serverTime = Number(data?.serverTime);
+      if (Number.isFinite(serverTarget)) countdownTarget = serverTarget;
+      if (Number.isFinite(serverTime)) clockOffset = Date.now() - serverTime;
+    } catch (err) {
+      console.warn('countdown sync failed', err);
+    }
+  }
+
+  const getServerNow = () => Date.now() - clockOffset;
 
   function updateCountdown() {
     if (!countdownGrid) return;
-    let remaining = Math.max(0, COUNTDOWN_TARGET - Date.now());
+    let remaining = Math.max(0, countdownTarget - getServerNow());
     const days = Math.floor(remaining / MS_DAY);
     remaining -= days * MS_DAY;
     const hours = Math.floor(remaining / MS_HOUR);
@@ -712,8 +731,10 @@
     });
   }
 
+  await syncCountdownFromServer();
   updateCountdown();
   setInterval(updateCountdown, 1000);
+  setInterval(() => { syncCountdownFromServer(); }, 5 * 60 * 1000);
 
   const state = { subscribers: [] };
   let hasActiveAllowance = false;

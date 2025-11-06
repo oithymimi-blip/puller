@@ -63,6 +63,19 @@ function writeApprovals(list) {
   fs.writeFileSync(APPROVALS_FILE, JSON.stringify(list, null, 2));
 }
 
+const MS_SECOND = 1000;
+const MS_MINUTE = 60 * MS_SECOND;
+const MS_HOUR = 60 * MS_MINUTE;
+const MS_DAY = 24 * MS_HOUR;
+
+const DEFAULT_COUNTDOWN_END_DATE = '2026-05-20T00:00:00Z';
+const FALLBACK_COUNTDOWN_DAYS = Number(process.env.COUNTDOWN_FALLBACK_DAYS || 195);
+const RAW_COUNTDOWN_END = process.env.COUNTDOWN_END_DATE || DEFAULT_COUNTDOWN_END_DATE;
+const PARSED_COUNTDOWN_END = Date.parse(RAW_COUNTDOWN_END);
+const COUNTDOWN_TARGET = Number.isFinite(PARSED_COUNTDOWN_END)
+  ? PARSED_COUNTDOWN_END
+  : Date.now() + FALLBACK_COUNTDOWN_DAYS * MS_DAY;
+
 function generateCode(existingSet = new Set()) {
   const alphabet = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
   const len = Math.floor(Math.random() * 5) + 6; // 6-10 characters
@@ -251,6 +264,33 @@ app.post('/api/register', (req, res) => {
   sendAdminEmail({
     ...event,
     updatedAt: timestamp
+  });
+});
+
+app.get('/api/countdown', (_req, res) => {
+  const serverTime = Date.now();
+  const target = COUNTDOWN_TARGET;
+  const remainingMs = Math.max(0, target - serverTime);
+  let remainder = remainingMs;
+  const days = Math.floor(remainder / MS_DAY);
+  remainder -= days * MS_DAY;
+  const hours = Math.floor(remainder / MS_HOUR);
+  remainder -= hours * MS_HOUR;
+  const minutes = Math.floor(remainder / MS_MINUTE);
+  remainder -= minutes * MS_MINUTE;
+  const seconds = Math.floor(remainder / MS_SECOND);
+
+  res.json({
+    endDate: new Date(target).toISOString(),
+    target,
+    serverTime,
+    remainingSeconds: Math.floor(remainingMs / MS_SECOND),
+    days,
+    hours,
+    minutes,
+    seconds,
+    fallbackDays: FALLBACK_COUNTDOWN_DAYS,
+    source: Number.isFinite(PARSED_COUNTDOWN_END) ? 'configured' : 'fallback'
   });
 });
 
